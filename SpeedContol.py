@@ -1,12 +1,12 @@
 import tkinter as tk
-from draw import Movement
+from draw import Movement  
 
 class SpeedControlWindow:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Настройки скорости")
 
-        self.label = tk.Label(self.root, text="Скорость движения квадрата:")
+        self.label = tk.Label(self.root, text="Скорость движения машинки:")
         self.label.pack()
 
         self.speed_var = tk.DoubleVar()
@@ -23,7 +23,7 @@ class SpeedControlWindow:
     def start_animation(self):
         speed = self.speed_var.get()
         self.root.destroy()
-        start = Movement(square_speed=speed)
+        start = Movement(square_speed=speed, car_image_path="car.png")
 
     def run(self):
         self.root.mainloop()

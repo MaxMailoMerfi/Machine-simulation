@@ -1,4 +1,3 @@
-
 import pygame
 import math
 import time
@@ -12,7 +11,7 @@ FPS = 60
 PAUSE_TIME = 2
 
 class Movement:
-    def __init__(self, square_speed=2) -> None:
+    def __init__(self, square_speed=2, car_image_path="car.png") -> None:
         self.square_speed = square_speed
 
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -23,6 +22,10 @@ class Movement:
 
         self.turn_points = []
         self.target_index = 0
+
+        # Загрузка изображения машинки
+        self.car_image = pygame.image.load(car_image_path)
+        self.car_image = pygame.transform.scale(self.car_image, (40, 40))  # Масштабирование изображения
 
         self.font = pygame.font.SysFont("Arial", 16, bold=True)
 
@@ -72,8 +75,9 @@ class Movement:
             pygame.draw.line(self.screen, BLACK, self.turn_points[i], self.turn_points[i + 1], 3)
 
     def draw_square(self):
-        """Рисуем квадрат (машинку)."""
-        pygame.draw.rect(self.screen, BLACK, (self.square_x - 10, self.square_y - 10, 20, 20))
+        """Рисуем машинку (вместо квадрата) с использованием изображения."""
+        car_rect = self.car_image.get_rect(center=(self.square_x, self.square_y))
+        self.screen.blit(self.car_image, car_rect)
 
     def draw_markers(self):
         start_text = self.font.render("А", True, BLACK)
