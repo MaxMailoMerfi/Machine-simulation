@@ -24,7 +24,6 @@ class SpeedControlWindow:
         speed = self.speed_var.get()
         self.root.destroy()
         run = Movement(square_speed=speed, car_image_path="car.png")
-        graph = GraphSpeed()
         graph.draw_graph(run.get_speed_log())
 
     def run(self):
