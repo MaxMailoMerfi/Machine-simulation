@@ -1,6 +1,7 @@
 import pygame
 import math
 import time
+from speed_graph import GraphSpeed
 
 pygame.init()
 
@@ -10,15 +11,16 @@ BLACK = (0, 0, 0)
 FPS = 60
 PAUSE_TIME = 2
 
-ACCELERATION = 0.1
-FRICTION = 0.01 
-MAX_SPEED = 5 
-TURN_SPEED = 2  # Скорость поворота машинки
+ACCELERATION = 0.5
+FRICTION = 0.05
+MAX_SPEED = 10 
+TURN_SPEED = 2
 
 class Movement:
     def __init__(self, square_speed=2, car_image_path="car.png") -> None:
         self.square_speed = square_speed
-        self.current_speed = 0  # Текущая скорость машинки
+        self.current_speed = 0
+        self.speed_log = []
 
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Извилистая дорога с точками А и Б")
@@ -37,8 +39,8 @@ class Movement:
         self.create_road()
 
         self.square_x, self.square_y = self.turn_points[0]
-        self.current_angle = 0  # Текущий угол машинки (направление движения)
-        self.target_angle = 0  # Угол к следующей точке
+        self.current_angle = 0
+        self.target_angle = 0
         self.draw_initial_state()
 
         time.sleep(PAUSE_TIME)
@@ -82,17 +84,19 @@ class Movement:
             pygame.draw.line(self.screen, BLACK, self.turn_points[i], self.turn_points[i + 1], 3)
 
     def draw_square(self):
-        # Плавное вращение машинки по направлению к следующей точке
-        angle_diff = (self.target_angle - self.current_angle + 180) % 360 - 180  # Найти разницу углов
+        angle_diff = (self.target_angle - self.current_angle + 180) % 360 - 180  
         if abs(angle_diff) > TURN_SPEED:
             self.current_angle += TURN_SPEED if angle_diff > 0 else -TURN_SPEED
         else:
-            self.current_angle = self.target_angle  # Если разница маленькая, установить угол
+            self.current_angle = self.target_angle  
 
-        # Поворот изображения машинки в соответствии с текущим углом
         rotated_car = pygame.transform.rotate(self.car_image, -self.current_angle)
         car_rect = rotated_car.get_rect(center=(self.square_x, self.square_y))
         self.screen.blit(rotated_car, car_rect)
+
+    def draw_speed(self):
+        speed_text = self.font.render(f"Speed: {self.current_speed:.2f}", True, BLACK)
+        self.screen.blit(speed_text, (10, 10))  
 
     def draw_markers(self):
         start_text = self.font.render("А", True, BLACK)
@@ -104,38 +108,54 @@ class Movement:
     def move_square(self):
         if self.target_index < len(self.turn_points):
             target_x, target_y = self.turn_points[self.target_index]
-            
-            # Рассчитываем направление на следующую точку (угол в радианах)
-            direction = math.atan2(target_y - self.square_y, target_x - self.square_x)
-            self.target_angle = math.degrees(direction)  # Преобразуем угол в градусы для поворота
+        
+        direction = math.atan2(target_y - self.square_y, target_x - self.square_x)
+        self.target_angle = math.degrees(direction)  
 
-            # Если текущая скорость меньше максимальной, увеличиваем её
-            if self.current_speed < MAX_SPEED:
-                self.current_speed += ACCELERATION
+        angle_diff = abs(self.target_angle - self.current_angle) % 360
+        if angle_diff > 180:
+            angle_diff = 360 - angle_diff
+        
+        turn_slowdown_factor = (angle_diff / 180) * 0.8  
 
-            # Применяем трение для снижения скорости
+        if angle_diff > 10:
+            self.current_speed *= (1 - turn_slowdown_factor)
+
+        if self.current_speed < MAX_SPEED:
+            self.current_speed += ACCELERATION
+
+        if self.current_speed > 0:
             self.current_speed -= FRICTION
             self.current_speed = max(self.current_speed, 0)
 
-            # Двигаем машинку в направлении к следующей точке
-            self.square_x += self.current_speed * math.cos(direction)
-            self.square_y += self.current_speed * math.sin(direction)
+        self.speed_log.append(self.current_speed)
 
-            # Проверяем, достигла ли машинка цели (расстояние до цели)
-            if math.hypot(target_x - self.square_x, target_y - self.square_y) < 5:
-                self.target_index += 1
+        self.square_x += self.current_speed * math.cos(direction)
+        self.square_y += self.current_speed * math.sin(direction)
+
+        if math.hypot(target_x - self.square_x, target_y - self.square_y) < 5:
+            self.target_index += 1
+        else:
+
+            print("Машинка достигла конечной точки.")
+
+
 
     def draw_initial_state(self):
         self.screen.fill(WHITE)
         self.draw_road()
         self.draw_square()
         self.draw_markers()
+        self.draw_speed()
         pygame.display.flip()
+
+    def get_speed_log(self):
+        return self.speed_log
 
     def main_loop(self):
         clock = pygame.time.Clock()
         running = True
-        
+    
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -147,8 +167,14 @@ class Movement:
             self.draw_square()
             self.draw_markers()
             self.move_square()
+            self.draw_speed()
 
             pygame.display.flip()
             clock.tick(FPS)
-        
+    
         pygame.quit()
+    
+        graph = GraphSpeed()
+        graph.draw_graph(self.get_speed_log())
+
+

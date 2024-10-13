@@ -23,7 +23,9 @@ class SpeedControlWindow:
     def start_animation(self):
         speed = self.speed_var.get()
         self.root.destroy()
-        Movement(square_speed=speed, car_image_path="car.png")
+        run = Movement(square_speed=speed, car_image_path="car.png")
+        graph = GraphSpeed()
+        graph.draw_graph(run.get_speed_log())
 
     def run(self):
         self.root.mainloop()
