@@ -1,5 +1,5 @@
 import tkinter as tk
-from draw import Movement  
+from draw import Movement
 
 class SpeedControlWindow:
     def __init__(self):
@@ -23,7 +23,7 @@ class SpeedControlWindow:
     def start_animation(self):
         speed = self.speed_var.get()
         self.root.destroy()
-        start = Movement(square_speed=speed, car_image_path="car.png")
+        Movement(square_speed=speed, car_image_path="car.png")
 
     def run(self):
         self.root.mainloop()
