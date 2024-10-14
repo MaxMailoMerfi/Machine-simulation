@@ -109,37 +109,34 @@ class Movement:
         if self.target_index < len(self.turn_points):
             target_x, target_y = self.turn_points[self.target_index]
         
-        direction = math.atan2(target_y - self.square_y, target_x - self.square_x)
-        self.target_angle = math.degrees(direction)  
+            direction = math.atan2(target_y - self.square_y, target_x - self.square_x)
+            self.target_angle = math.degrees(direction)  
 
-        angle_diff = abs(self.target_angle - self.current_angle) % 360
-        if angle_diff > 180:
-            angle_diff = 360 - angle_diff
-        
-        turn_slowdown_factor = (angle_diff / 180) * 0.8  
+            angle_diff = abs(self.target_angle - self.current_angle) % 360
+            if angle_diff > 180:
+                angle_diff = 360 - angle_diff
+            
+            turn_slowdown_factor = (angle_diff / 180) * 0.8  
 
-        if angle_diff > 10:
-            self.current_speed *= (1 - turn_slowdown_factor)
+            if angle_diff > 10:
+                self.current_speed *= (1 - turn_slowdown_factor)
 
-        if self.current_speed < MAX_SPEED:
-            self.current_speed += ACCELERATION
+            if self.current_speed < MAX_SPEED:
+                self.current_speed += ACCELERATION
 
-        if self.current_speed > 0:
-            self.current_speed -= FRICTION
-            self.current_speed = max(self.current_speed, 0)
+            if self.current_speed > 0:
+                self.current_speed -= FRICTION
+                self.current_speed = max(self.current_speed, 0)
 
-        self.speed_log.append(self.current_speed)
+            self.speed_log.append(self.current_speed)
 
-        self.square_x += self.current_speed * math.cos(direction)
-        self.square_y += self.current_speed * math.sin(direction)
+            self.square_x += self.current_speed * math.cos(direction)
+            self.square_y += self.current_speed * math.sin(direction)
 
-        if math.hypot(target_x - self.square_x, target_y - self.square_y) < 5:
-            self.target_index += 1
-        else:
-
-            print("Машинка достигла конечной точки.")
-
-
+            if math.hypot(target_x - self.square_x, target_y - self.square_y) < 5:
+                self.target_index += 1
+            else:
+                pass
 
     def draw_initial_state(self):
         self.screen.fill(WHITE)
@@ -155,14 +152,13 @@ class Movement:
     def main_loop(self):
         clock = pygame.time.Clock()
         running = True
-    
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
             self.screen.fill(WHITE)
-
             self.draw_road()
             self.draw_square()
             self.draw_markers()
@@ -171,10 +167,11 @@ class Movement:
 
             pygame.display.flip()
             clock.tick(FPS)
-    
+
         pygame.quit()
-    
+
         graph = GraphSpeed()
         graph.draw_graph(self.get_speed_log())
+
 
 
