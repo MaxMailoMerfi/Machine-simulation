@@ -10,7 +10,7 @@ class SpeedControlWindow:
         self.label.pack()
 
         self.speed_var = tk.DoubleVar()
-        self.speed_var.set(2)
+        self.speed_var.set(2)  # Начальная скорость по умолчанию
 
         self.speed_scale = tk.Scale(
             self.root, from_=0.1, to=10.0, resolution=0.1, orient='horizontal', variable=self.speed_var
@@ -23,7 +23,8 @@ class SpeedControlWindow:
     def start_animation(self):
         speed = self.speed_var.get()
         self.root.destroy()
-        run = Movement(square_speed=speed, car_image_path="car.png")
+        run = Movement(square_speed=speed, car_image_path="car.png")  # Передача скорости в Movement
 
     def run(self):
         self.root.mainloop()
+

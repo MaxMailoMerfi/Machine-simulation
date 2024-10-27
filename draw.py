@@ -1,7 +1,7 @@
 import pygame
 import math
 import time
-import random  # для генерации случайных углов и длин сегментов
+import random
 from speed_graph import GraphSpeed
 
 pygame.init()
@@ -55,11 +55,11 @@ class Movement:
             x2 = x + segment_length * math.cos(math.radians(angle))
             y2 = y + segment_length * math.sin(math.radians(angle))
 
-            if 50 < y2 < HEIGHT - 50:
+            # Проверка, чтобы точки дороги оставались в пределах экрана
+            if 50 < y2 < HEIGHT - 50 and 50 < x2 < WIDTH - 50:
                 self.turn_points.append((x2, y2))
                 x, y = x2, y2
 
-        # Добавляем конечную точку
         if x < WIDTH - 50:
             self.turn_points.append((WIDTH - 50, y))
 
@@ -114,13 +114,11 @@ class Movement:
 
             self.speed_log.append(self.current_speed)
 
-            self.square_x += self.current_speed * math.cos(direction)
-            self.square_y += self.current_speed * math.sin(direction)
+            self.square_x = max(0, min(WIDTH, self.square_x + self.current_speed * math.cos(direction)))
+            self.square_y = max(0, min(HEIGHT, self.square_y + self.current_speed * math.sin(direction)))
 
             if math.hypot(target_x - self.square_x, target_y - self.square_y) < 5:
                 self.target_index += 1
-            else:
-                pass
 
     def draw_initial_state(self):
         self.screen.fill(WHITE)
