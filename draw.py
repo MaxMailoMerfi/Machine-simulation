@@ -1,6 +1,7 @@
 import pygame
 import math
 import time
+import random  # для генерации случайных углов и длин сегментов
 from speed_graph import GraphSpeed
 
 pygame.init()
@@ -25,9 +26,6 @@ class Movement:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Извилистая дорога с точками А и Б")
 
-        self.segment_length = 100
-        self.angle = 45
-
         self.turn_points = []
         self.target_index = 0
 
@@ -51,31 +49,17 @@ class Movement:
         angle = 0
 
         while x < WIDTH - 150:
-            x2 = x + self.segment_length * math.cos(math.radians(angle))
-            y2 = y + self.segment_length * math.sin(math.radians(angle))
+            angle += random.randint(-45, 45) 
+            segment_length = random.randint(50, 120) 
+
+            x2 = x + segment_length * math.cos(math.radians(angle))
+            y2 = y + segment_length * math.sin(math.radians(angle))
 
             if 50 < y2 < HEIGHT - 50:
                 self.turn_points.append((x2, y2))
                 x, y = x2, y2
 
-            angle += self.angle
-            x2 = x + 75 * math.cos(math.radians(angle))
-            y2 = y + 75 * math.sin(math.radians(angle))
-
-            if 50 < y2 < HEIGHT - 50:
-                self.turn_points.append((x2, y2))
-                x, y = x2, y2
-
-            angle -= self.angle * 2
-            x2 = x + 75 * math.cos(math.radians(angle))
-            y2 = y + 75 * math.sin(math.radians(angle))
-
-            if 50 < y2 < HEIGHT - 50:
-                self.turn_points.append((x2, y2))
-                x, y = x2, y2
-
-            angle += self.angle
-
+        # Добавляем конечную точку
         if x < WIDTH - 50:
             self.turn_points.append((WIDTH - 50, y))
 
@@ -172,6 +156,3 @@ class Movement:
 
         graph = GraphSpeed()
         graph.draw_graph(self.get_speed_log())
-
-
-
